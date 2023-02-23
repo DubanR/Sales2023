@@ -7,7 +7,7 @@ namespace Sales.API.Controllers
 {
     [ApiController]
     [Route("/api/countries")]
-    public class CountriesController: ControllerBase
+    public class CountriesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -30,7 +30,7 @@ namespace Sales.API.Controllers
             return Ok(await _context.Countries.ToListAsync());
         }
 
-        [HttpGet("id: int")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
             var country = await _context.Countries.FirstOrDefaultAsync(x => x.id == id);
@@ -49,7 +49,7 @@ namespace Sales.API.Controllers
             return Ok(country);
         }
 
-        [HttpDelete("id: int")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
             var country = await _context.Countries.FirstOrDefaultAsync(x => x.id == id);
