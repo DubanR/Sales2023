@@ -19,9 +19,25 @@ namespace Sales.API.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Country country)
         {
-            _context.Add(country);
-            await _context.SaveChangesAsync();
-            return Ok(country);
+            try
+            {
+                _context.Add(country);
+                await _context.SaveChangesAsync();
+                return Ok(country);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
+                {
+                    return BadRequest("El país ya existe");
+                }
+
+                return BadRequest(dbUpdateException.Message);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
 
         [HttpGet]
@@ -44,9 +60,25 @@ namespace Sales.API.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(Country country)
         {
-            _context.Update(country);
-            await _context.SaveChangesAsync();
-            return Ok(country);
+            try
+            {
+                _context.Update(country);
+                await _context.SaveChangesAsync();
+                return Ok(country);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
+                {
+                    return BadRequest("El país ya existe");
+                }
+
+                return BadRequest(dbUpdateException.Message);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
 
         [HttpDelete("{id:int}")]
