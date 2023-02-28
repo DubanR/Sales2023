@@ -22,10 +22,68 @@ namespace Sales.API.Data
         {
             if (!_context.Countries.Any())
             {
-                _context.Countries.Add(new Country { name = "Colombia" });
-                _context.Countries.Add(new Country { name = "Chile" });
-                _context.Countries.Add(new Country { name = "Mexico" });
-
+                _context.Countries.Add(new Country
+                {
+                    name = "Colombia",
+                    States = new List<State>()
+                    {
+                        new State()
+                        {
+                            name = "Antioquia",
+                            Cities = new List<City>()
+                            {
+                                new City() { name = "Medellín" },
+                                new City() { name = "Itagüí" },
+                                new City() { name = "Envigado" },
+                                new City() { name = "Bello" },
+                                new City() { name = "Rionegro" },
+                            }
+                        },
+                        new State()
+                        {
+                            name = "Bogotá",
+                            Cities = new List<City>()
+                            {
+                                new City() { name = "Usaquen" },
+                                new City() { name = "Champinero" },
+                                new City() { name = "Santa fe" },
+                                new City() { name = "Useme" },
+                                new City() { name = "Bosa" },
+                            }
+                        },
+                    }
+                });
+                _context.Countries.Add(new Country
+                {
+                    name = "Estados Unidos",
+                    States = new List<State>()
+                    {
+                        new State()
+                        {
+                            name = "Florida",
+                            Cities = new List<City>()
+                            {
+                                new City() { name = "Orlando" },
+                                new City() { name = "Miami" },
+                                new City() { name = "Tampa" },
+                                new City() { name = "Fort Lauderdale" },
+                                new City() { name = "Key West" },
+                            }
+                         },
+                        new State()
+                        {
+                            name = "Texas",
+                            Cities = new List<City>()
+                            {
+                                new City() { name = "Houston" },
+                                new City() { name = "San Antonio" },
+                                new City() { name = "Dallas" },
+                                new City() { name = "Austin" },
+                                new City() { name = "El Paso" },
+                            }
+                        },
+                    }
+                });
                 await _context.SaveChangesAsync();
             }
         }
