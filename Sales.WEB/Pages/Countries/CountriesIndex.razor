@@ -28,6 +28,7 @@
                             @country.StatesNumber
                         </td>
                         <td>
+                            <a class="btn btn-info" href="/countries/details/@country.id">Detalles</a>
                             <a class="btn btn-warning" href="/countries/edit/@country.id">Editar</a>
                             <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.id))>Borrar</button>
                         </td>

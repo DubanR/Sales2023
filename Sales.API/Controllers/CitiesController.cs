@@ -6,30 +6,30 @@ using Sales.Shared.Entities;
 namespace Sales.API.Controllers
 {
     [ApiController]
-    [Route("/api/countries")]
-    public class CountriesController : ControllerBase
+    [Route("/api/cities")]
+    public class CitiesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public CountriesController(DataContext context)
+        public CitiesController(DataContext context)
         {
             _context = context;
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Country country)
+        public async Task<ActionResult> Post(City city)
         {
             try
             {
-                _context.Add(country);
+                _context.Add(city);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(city);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("El país ya existe");
+                    return BadRequest("La ciudad ya existe");
                 }
 
                 return BadRequest(dbUpdateException.Message);
@@ -43,48 +43,34 @@ namespace Sales.API.Controllers
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            return Ok(await _context.Countries
-                .Include(x => x.States)
-                .ToListAsync());
-        }
-
-        [HttpGet("full")]
-        public async Task<ActionResult> GetFull()
-        {
-            return Ok(await _context.Countries
-                .Include(x => x.States!)
-                .ThenInclude(x => x.Cities)
-                .ToListAsync());
+            return Ok(await _context.Cities.ToListAsync());
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries
-                .Include (x => x.States!)
-                .ThenInclude(x => x.Cities)
-                .FirstOrDefaultAsync(x => x.id == id);
-            if (country == null)
+            var city = await _context.Cities.FirstOrDefaultAsync(x => x.id == id);
+            if (city == null)
             {
                 return NotFound();
             }
-            return Ok(country);
+            return Ok(city);
         }
 
         [HttpPut]
-        public async Task<ActionResult> Put(Country country)
+        public async Task<ActionResult> Put(City city)
         {
             try
             {
-                _context.Update(country);
+                _context.Update(city);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(city);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("El país ya existe");
+                    return BadRequest("La ciudad ya existe");
                 }
 
                 return BadRequest(dbUpdateException.Message);
@@ -98,13 +84,13 @@ namespace Sales.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(x => x.id == id);
-            if (country == null)
+            var city = await _context.Cities.FirstOrDefaultAsync(x => x.id == id);
+            if (city == null)
             {
                 return NotFound();
             }
 
-            _context.Remove(country);
+            _context.Remove(city);
             await _context.SaveChangesAsync();
             return NoContent();
         }
