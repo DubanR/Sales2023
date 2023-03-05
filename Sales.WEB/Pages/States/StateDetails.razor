@@ -1,44 +1,39 @@
-﻿@page "/countries/details/{id:int}"
+﻿@page "/states/details/{stateId:int}"
 @inject IRepository repository
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-@if (country is null)
+@if (state is null)
 {
     <p>Cargando...</p>
 }
 else
 {
-    <h3>@country.name</h3>
+    <h3>@state.name</h3>
     <div class="mb-2">
-        <a class="btn btn-primary" href="/states/create/@country.id">Nuevo Estado/Departamento</a>
-        <a class="btn btn-success" href="/countries">Regresar</a>
+        <a class="btn btn-primary" href="/cities/create/@stateId">Nueva ciudad</a>
+        <a class="btn btn-success" href="/countries/details/@state.Countryid">Regresar</a>
     </div>
 
-    <GenericList MyList="country.States!.ToList()">
+    <GenericList MyList="state.Cities!.ToList()">
         <Body>
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Estado / Departamento</th>
-                        <th>Ciudades</th>
+                        <th>Ciudad</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var state in country.States!.ToList())
+                    @foreach (var city in state.Cities!.ToList())
                     {
                         <tr>
                             <td>
-                                @state.name
+                                @city.name
                             </td>
                             <td>
-                                @state.CitiesNumber
-                            </td>
-                            <td>
-                                <a class="btn btn-info" href="/states/details/@state.id">Detalles</a>
-                                <a class="btn btn-warning" href="/states/edit/@state.id">Editar</a>
-                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(state.id))>Borrar</button>
+                                <a class="btn btn-warning" href="/cities/edit/@city.id">Editar</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(city.id))>Borrar</button>
                             </td>
                         </tr>
                     }
@@ -49,11 +44,10 @@ else
 }
 
 @code {
-    private Country? country;
+    private State? state;
 
     [Parameter]
-
-    public int id { get; set; }
+    public int stateId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,7 +56,7 @@ else
 
     private async Task LoadAsync()
     {
-        var responseHttp = await repository.Get<Country>($"/api/countries/{id}");
+        var responseHttp = await repository.Get<State>($"/api/states/{stateId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
@@ -76,10 +70,10 @@ else
             return;
         }
 
-        country = responseHttp.Response;
+        state = responseHttp.Response;
     }
 
-    private async Task DeleteAsync(int id)
+    private async Task DeleteAsync(int cityId)
     {
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
@@ -97,7 +91,7 @@ else
             return;
         }
 
-        var responseHttp = await repository.Delete($"/api/states/{id}");
+        var responseHttp = await repository.Delete($"/api/cities/{cityId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode != HttpStatusCode.NotFound)
