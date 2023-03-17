@@ -6,49 +6,56 @@
 
 <h3>Categorias</h3>
 
-<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
-    <div>
-        <a class="btn btn-primary mb-3" href="/categories/create">Nueva Categoria</a>
+@if (Categories is null)
+{
+    <div class="spinner"/>
+}
+else
+{
+    <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+        <div>
+            <a class="btn btn-primary mb-3" href="/categories/create">Nueva Categoria</a>
+        </div>
+        <div class="mx-2">
+            <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar categoria..." @bind-value="Filter" />
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+            <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+        </div>
     </div>
-    <div class="mx-2">
-        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar categoria..." @bind-value="Filter" />
-    </div>
-    <div>
-        <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
-        <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
-    </div>
-</div>
 
-<Pagination CurrentPage="currentPage"
+    <Pagination CurrentPage="currentPage"
             TotalPages="totalPages"
             SelectedPage="SelectedPageAsync" />
 
-<GenericList MyList="Categories">
-    <Body>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Categoria</th>
-                    <th style="width:260px"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var category in Categories!)
-                {
+    <GenericList MyList="Categories">
+        <Body>
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td>
-                            @category.name
-                        </td>
-                        <td>
-                            <a class="btn btn-warning" href="/categories/edit/@category.id">Editar</a>
-                            <button class="btn btn-danger" @onclick=@(() => DeleteAsync(category.id))>Borrar</button>
-                        </td>
+                        <th>Categoria</th>
+                        <th style="width:260px"></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </Body>
-</GenericList>
+                </thead>
+                <tbody>
+                    @foreach (var category in Categories!)
+                    {
+                        <tr>
+                            <td>
+                                @category.name
+                            </td>
+                            <td>
+                                <a class="btn btn-warning" href="/categories/edit/@category.id">Editar</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(category.id))>Borrar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </Body>
+    </GenericList>
+}
 
 @code {
     public List<Category>? Categories { get; set; }
