@@ -10,5 +10,10 @@ namespace Sales.Shared.Entities
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Display(Name = "Categoria")]
         public string name { get; set; } = null!;
+
+        public ICollection<ProductCategory>? ProductCategories { get; set; }
+
+        [Display(Name = "Productos")]
+        public int ProductCategoriesNumber => ProductCategories == null ? 0 : ProductCategories.Count;
     }
 }
