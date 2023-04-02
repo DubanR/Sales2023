@@ -121,20 +121,91 @@ namespace Sales.API.Controllers
             }
         }
 
+        [HttpPost("addImages")]
+        public async Task<ActionResult> PostAddImagesAsync(ImageDTO imageDTO)
+        {
+            var product = await _context.Products
+                .Include(x => x.ProductImages)
+                .FirstOrDefaultAsync(x => x.id == imageDTO.ProductId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (product.ProductImages is null)
+            {
+                product.ProductImages = new List<ProductImage>();
+            }
+
+            for (int i = 0; i < imageDTO.Images.Count; i++)
+            {
+                if (!imageDTO.Images[i].StartsWith("https://sales2023.blob.core.windows.net/products/"))
+                {
+                    var photoProduct = Convert.FromBase64String(imageDTO.Images[i]);
+                    imageDTO.Images[i] = await _fileStorage.SaveFileAsync(photoProduct, ".jpg", "products");
+                    product.ProductImages!.Add(new ProductImage { image = imageDTO.Images[i] });
+                }
+            }
+
+            _context.Update(product);
+            await _context.SaveChangesAsync();
+            return Ok(imageDTO);
+        }
+
+        [HttpPost("removeLastImage")]
+        public async Task<ActionResult> PostRemoveLastImageAsync(ImageDTO imageDTO)
+        {
+            var product = await _context.Products
+                .Include(x => x.ProductImages)
+                .FirstOrDefaultAsync(x => x.id == imageDTO.ProductId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (product.ProductImages is null || product.ProductImages.Count == 0)
+            {
+                return Ok();
+            }
+
+            var lastImage = product.ProductImages.LastOrDefault();
+            await _fileStorage.RemoveFileAsync(lastImage!.image, "products");
+            product.ProductImages.Remove(lastImage);
+            _context.Update(product);
+            await _context.SaveChangesAsync();
+            imageDTO.Images = product.ProductImages.Select(x => x.image).ToList();
+            return Ok(imageDTO);
+        }
+
+
         [HttpPut]
-        public async Task<ActionResult> PutAsync(Product product)
+        public async Task<ActionResult> PutAsync(ProductDTO productDTO)
         {
             try
             {
+                var product = await _context.Products
+                    .Include(x => x.ProductCategories)
+                    .FirstOrDefaultAsync(x => x.id == productDTO.id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                product.Name = productDTO.Name;
+                product.description = productDTO.description;
+                product.price = productDTO.price;
+                product.stock = productDTO.stock;
+                product.ProductCategories = productDTO.ProductCategoryIds!.Select(x => new ProductCategory { categoryId = x }).ToList();
+
                 _context.Update(product);
                 await _context.SaveChangesAsync();
-                return Ok(product);
+                return Ok(productDTO);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un producto con el mismo nombre.");
+                    return BadRequest("Ya existe una ciudad con el mismo nombre.");
                 }
 
                 return BadRequest(dbUpdateException.Message);
