@@ -76,5 +76,50 @@ namespace Sales.API.Controllers
                 .Where(x => x.user!.Email == User.Identity!.Name)
                 .SumAsync(x => x.quantity));
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult> Get(int id)
+        {
+            return Ok(await _context.TemporalSales
+                .Include(ts => ts.user!)
+                .Include(ts => ts.product!)
+                .ThenInclude(p => p.ProductCategories!)
+                .ThenInclude(pc => pc.category)
+                .Include(ts => ts.product!)
+                .ThenInclude(p => p.ProductImages)
+                .FirstOrDefaultAsync(x => x.id == id));
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> Put(TemporalSaleDTO temporalSaleDTO)
+        {
+            var currentTemporalSale = await _context.TemporalSales.FirstOrDefaultAsync(x => x.id == temporalSaleDTO.id);
+            if (currentTemporalSale == null)
+            {
+                return NotFound();
+            }
+
+            currentTemporalSale!.remarks = temporalSaleDTO.remarks;
+            currentTemporalSale.quantity = temporalSaleDTO.quantity;
+
+            _context.Update(currentTemporalSale);
+            await _context.SaveChangesAsync();
+            return Ok(temporalSaleDTO);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var temporalSale = await _context.TemporalSales.FirstOrDefaultAsync(x => x.id == id);
+            if (temporalSale == null)
+            {
+                return NotFound();
+            }
+
+            _context.Remove(temporalSale);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }
