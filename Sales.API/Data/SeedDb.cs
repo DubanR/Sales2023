@@ -4,6 +4,7 @@ using Sales.API.Services;
 using Sales.Shared.Entities;
 using Sales.Shared.Enums;
 using Sales.Shared.Responses;
+using System.Runtime.InteropServices;
 
 namespace Sales.API.Data
 {
@@ -92,7 +93,16 @@ namespace Sales.API.Data
 
             foreach (string? image in images)
             {
-                var filePath = $"{Environment.CurrentDirectory}\\Images\\products\\{image}";
+                string filePath;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    filePath = $"{Environment.CurrentDirectory}\\Images\\products\\{image}";
+                }
+                else
+                {
+                    filePath = $"{Environment.CurrentDirectory}/Images/products/{image}";
+                }
+
                 var fileBytes = File.ReadAllBytes(filePath);
                 var imagePath = await _fileStorage.SaveFileAsync(fileBytes, "jpg", "products");
                 prodcut.ProductImages.Add(new ProductImage { image = imagePath });
@@ -118,7 +128,16 @@ namespace Sales.API.Data
                     city = await _context.Cities.FirstOrDefaultAsync();
                 }
 
-                var filePath = $"{Environment.CurrentDirectory}\\Images\\users\\{image}";
+                string filePath;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    filePath = $"{Environment.CurrentDirectory}\\Images\\products\\{image}";
+                }
+                else
+                {
+                    filePath = $"{Environment.CurrentDirectory}/Images/products/{image}";
+                }
+
                 var fileBytes = File.ReadAllBytes(filePath);
                 var imagePath = await _fileStorage.SaveFileAsync(fileBytes, "jpg", "users");
 
